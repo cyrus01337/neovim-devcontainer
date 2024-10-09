@@ -8,7 +8,6 @@ on:
 jobs:
     publish:
         name: Publish to Docker Hub
-        needs: check
         runs-on: ubuntu-latest
 
         steps:
