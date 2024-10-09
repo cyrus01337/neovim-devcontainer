@@ -1,7 +1,5 @@
 {
     "name": "Neovim",
-    "dockerFile": "Dockerfile",
-    "workspaceFolder": "/workspace",
-    "postCreateUser": "neovim",
-    "remoteUser": "neovim"
+    "image": "cyrus01337/neovim",
+    "workspaceFolder": "/workspace"
 }
