@@ -28,7 +28,7 @@ jobs:
                   REAL_AUTHOR=${AUTHOR:-${split_by_slash[0]}}
 
                   echo "AUTHOR=$REAL_AUTHOR" >> "$GITHUB_ENV"
-                  echo "TAG=$REAL_AUTHOR/neovim" >> "$GITHUB_ENV"
+                  echo "TAG=$REAL_AUTHOR/neovim-devcontainer" >> "$GITHUB_ENV"
 
             - uses: docker/setup-buildx-action@v3
               name: Setup Docker Buildx
