@@ -39,4 +39,3 @@ automatically
 
 ## Author's Note
 I regret nothing.
-
