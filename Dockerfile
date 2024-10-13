@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim AS system
+FROM cyrus01337/shell-devcontainer AS system
 ENV DEBIAN_FRONTEND="noninteractive"
 ENV USER="developer"
 ENV GROUP="$USER"
@@ -6,24 +6,12 @@ ENV HOME="/home/$USER"
 USER root
 WORKDIR /workspace
 
-RUN ["apt-get", "update"]
-RUN ["apt-get", "dist-upgrade", "-y"]
-RUN ["apt-get", "install", "-y", "black", "curl", "fd-find", "gcc", "git", "isort", "lua5.1", "luarocks", "make", "python3.11-venv", "python3-pip", "ripgrep", "sudo", "unzip", "zsh"]
+RUN ["apt-get", "install", "-y", "black", "fd-find", "gcc", "git", "isort", "lua5.1", "luarocks", "make", "python3.11-venv", "python3-pip", "ripgrep", "unzip"]
 RUN ["apt-get", "install", "-y", "iproute2"]
 
 RUN ["update-alternatives", "--install", "/usr/bin/python", "python", "/usr/bin/python3", "20"]
-RUN addgroup $GROUP \
-    && useradd -mg $USER -G sudo -s /usr/bin/zsh $USER \
-    && echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 RUN addgroup docker \
     && usermod -aG docker $USER;
-
-FROM system AS cargo
-USER $USER
-
-RUN curl -fsLS https://sh.rustup.rs | sh -s -- -y \
-    && . $HOME/.cargo/env \
-    && rustup default stable;
 
 FROM system AS dive
 USER root
@@ -97,4 +85,3 @@ RUN ["apt-get", "autoremove", "-y"]
 
 FROM cleanup AS final
 USER $USER
-
