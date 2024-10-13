@@ -73,8 +73,6 @@ RUN curl -fsLS https://github.com/neovim/neovim/releases/download/v0.10.1/nvim-l
 FROM system AS cleanup
 USER root
 
-COPY --from=cargo --chown=$USER:$GROUP $HOME/.cargo/ $HOME/.cargo/
-COPY --from=cargo --chown=$USER:$GROUP $HOME/.rustup/ $HOME/.rustup/
 COPY --from=go /go/ /usr/local/
 COPY --from=node --chown=$USER:$GROUP $HOME/.local/share/fnm/ $HOME/.local/share/fnm/
 COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
