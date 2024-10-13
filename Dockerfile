@@ -37,6 +37,14 @@ RUN curl -fsLS https://go.dev/dl/go1.23.1.linux-amd64.tar.gz -o go.tar.gz \
     && tar xfz go.tar.gz \
     && rm go.tar.gz
 
+FROM system AS neovim
+USER root
+WORKDIR /neovim
+
+RUN curl -fsLS https://github.com/neovim/neovim/releases/download/v0.10.1/nvim-linux64.tar.gz -o neovim.zip \
+    && tar xfz neovim.zip --strip-components=1 \
+    && rm neovim.zip;
+
 FROM system AS node
 USER $USER
 
@@ -62,21 +70,13 @@ RUN curl -fsLS https://github.com/JohnnyMorganz/StyLua/releases/download/v0.20.0
     && unzip stylua.zip \
     && rm stylua.zip;
 
-FROM system AS neovim
-USER root
-WORKDIR /neovim
-
-RUN curl -fsLS https://github.com/neovim/neovim/releases/download/v0.10.1/nvim-linux64.tar.gz -o neovim.zip \
-    && tar xfz neovim.zip --strip-components=1 \
-    && rm neovim.zip;
-
 FROM system AS cleanup
 USER root
 
 COPY --from=go /go/ /usr/local/
+COPY --from=neovim /neovim/ /usr/
 COPY --from=node --chown=$USER:$GROUP $HOME/.local/share/fnm/ $HOME/.local/share/fnm/
 COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
-COPY --from=neovim /neovim/ /usr/
 
 RUN ["apt-get", "clean"]
 RUN ["apt-get", "autoremove", "-y"]
