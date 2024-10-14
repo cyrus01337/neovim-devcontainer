@@ -55,7 +55,7 @@ ENV PATH="$HOME/.local/share/fnm:$PATH"
 RUN eval "$(fnm env --shell bash)" \
     && fnm install 22 \
     && fnm use 22 \
-    && npm install -g npm prettier;
+    && npm install -g live-server npm prettier;
 
 FROM system AS python
 USER $USER
