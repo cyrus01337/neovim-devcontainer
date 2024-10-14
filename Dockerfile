@@ -6,11 +6,14 @@ ENV HOME="/home/$USER"
 USER root
 WORKDIR /workspace
 
-RUN ["apt-get", "install", "-y", "black", "fd-find", "gcc", "git", "isort", "lua5.1", "luarocks", "make", "python3.11-venv", "python3-pip", "ripgrep", "unzip"]
-RUN ["apt-get", "install", "-y", "iproute2"]
-
-RUN ["update-alternatives", "--install", "/usr/bin/python", "python", "/usr/bin/python3", "20"]
-RUN addgroup docker \
+RUN apt-get install -y --no-install-recommends --no-install-suggests black fd-find gcc git isort lua5.1 luarocks make python3.11-venv python3-pip ripgrep unzip \
+    iproute2 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    \
+    && update-alternatives --install /usr/bin/python python /usr/bin/python3 20 \
+    \
+    && addgroup docker \
     && usermod -aG docker $USER;
 
 FROM system AS dive
@@ -18,16 +21,16 @@ USER root
 
 COPY ./install-dive.sh .
 
-RUN ["./install-dive.sh"]
-RUN ["rm", "./install-dive.sh"]
+RUN ./install-dive.sh \
+    && rm ./install-dive.sh
 
 FROM system AS github-cli
 USER root
 
 COPY ./install-github-cli.sh .
 
-RUN ["./install-github-cli.sh"]
-RUN ["rm", "./install-github-cli.sh"]
+RUN ./install-github-cli.sh \
+    && rm ./install-github-cli.sh
 
 FROM system AS go
 USER $USER
@@ -41,9 +44,9 @@ FROM system AS neovim
 USER root
 WORKDIR /neovim
 
-RUN curl -fsLS https://github.com/neovim/neovim/releases/download/v0.10.1/nvim-linux64.tar.gz -o neovim.zip \
-    && tar xfz neovim.zip --strip-components=1 \
-    && rm neovim.zip;
+RUN curl -fsLS https://github.com/neovim/neovim/releases/download/v0.10.1/nvim-linux64.tar.gz -o neovim.tar.gz \
+    && tar xfz neovim.tar.gz --strip-components=1 \
+    && rm neovim.tar.gz;
 
 FROM system AS node
 USER $USER
@@ -78,6 +81,7 @@ COPY --from=neovim /neovim/ /usr/
 COPY --from=node --chown=$USER:$GROUP $HOME/.local/share/fnm/ $HOME/.local/share/fnm/
 COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
 
+RUN ["rm", "-rf", "/var/lib/apt/lists/*"]
 RUN ["apt-get", "clean"]
 RUN ["apt-get", "autoremove", "-y"]
 
