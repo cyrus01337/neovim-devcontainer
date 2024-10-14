@@ -21,18 +21,13 @@ This also acts as a base for other devcontainers like those that require [Bun](h
 which I've used [here](https://github.com/cyrus01337/bun-devcontainer).
 
 ## Inclusions
-- Debian 12 (Bookworm) OS
-- `developer` user with home directory
+- Whatever is included in the [Shell devcontainer](https://github.com/cyrus01337/shell-devcontainer)
 - Docker outside of Docker (with user added to `docker` group)
 - Obviously [Neovim](https://neovim.io/)
-- [`cargo`](https://crates.io/) amidst other build tools for compilation (you
-can see the full list in the [Dockerfile](https://github.com/cyrus01337/neovim-devcontainer/blob/main/Dockerfile))
-    - **Note:** Certain dependencies like live-server are auto-compiled, expect
-      to wait when starting Neovim
 - [`dive`](https://github.com/wagoodman/dive) for Docker image debugging
 - [`github-cli`](https://cli.github.com/) for GitHub repo manipulation
 - [`go`](https://go.dev/) as a plugin dependency
-- [`node`](https://nodejs.org/) as a plugin dependency
+- [`node`](https://nodejs.org/) as a plugin dependency and installer for [`live-server`](https://www.npmjs.com/package/live-server)
 - [`python`](https://www.python.org/) as a plugin dependency, with `python3` linked to `python`
 automatically
 - [`stylua`](https://github.com/JohnnyMorganz/StyLua) for auto-formatting
