@@ -6,7 +6,8 @@ ENV HOME="/home/$USER"
 USER root
 WORKDIR /workspace
 
-RUN apt-get install -y --no-install-recommends --no-install-suggests black fd-find gcc git isort lua5.1 luarocks make python3.11-venv python3-pip ripgrep unzip \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends --no-install-suggests black fd-find gcc git isort lua5.1 luarocks make python3.11-venv python3-pip ripgrep unzip \
     iproute2 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
@@ -15,6 +16,12 @@ RUN apt-get install -y --no-install-recommends --no-install-suggests black fd-fi
     \
     && addgroup docker \
     && usermod -aG docker $USER;
+
+FROM system AS configuration
+USER root
+WORKDIR /configuration
+
+RUN git clone --depth=1 --separate-git-dir=$(mktemp -u) https://github.com/cyrus01337/neovim-configuration.git .;
 
 FROM system AS dive
 USER root
@@ -76,10 +83,12 @@ RUN curl -fsLS https://github.com/JohnnyMorganz/StyLua/releases/download/v0.20.0
 FROM system AS cleanup
 USER root
 
+COPY --from=configuration --chown=$USER:$GROUP /configuration $HOME/.config/nvim
 COPY --from=go /go/ /usr/local/
 COPY --from=neovim /neovim/ /usr/
-COPY --from=node --chown=$USER:$GROUP $HOME/.local/share/fnm/ $HOME/.local/share/fnm/
 COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
+
+COPY --from=node --chown=$USER:$GROUP $HOME/.local/share/fnm/ $HOME/.local/share/fnm/
 
 RUN ["rm", "-rf", "/var/lib/apt/lists/*"]
 RUN ["apt-get", "clean"]
