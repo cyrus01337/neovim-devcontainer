@@ -4,7 +4,6 @@ ENV USER="developer"
 ENV GROUP="$USER"
 ENV HOME="/home/$USER"
 USER root
-WORKDIR /workspace
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends --no-install-suggests black fd-find gcc git isort lua5.1 luarocks make python3.11-venv python3-pip ripgrep unzip \
@@ -96,6 +95,7 @@ RUN rm -rf /var/lib/apt/lists/* \
 
 FROM cleanup AS final
 USER $USER
+WORKDIR /workspace
 
 RUN touch $HOME/.gitconfig $HOME/.git-credentials \
     && mkdir -p $HOME/.local/share/nvim;
