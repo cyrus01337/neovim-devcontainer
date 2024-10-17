@@ -17,12 +17,6 @@ RUN apt-get update \
     && addgroup docker \
     && usermod -aG docker $USER;
 
-FROM system AS configuration
-USER root
-WORKDIR /configuration
-
-RUN git clone --depth=1 --separate-git-dir=$(mktemp -u) https://github.com/cyrus01337/neovim-configuration.git .;
-
 FROM system AS dive
 USER root
 
@@ -83,7 +77,7 @@ RUN curl -fsLS https://github.com/JohnnyMorganz/StyLua/releases/download/v0.20.0
 FROM system AS cleanup
 USER root
 
-COPY --from=configuration --chown=$USER:$GROUP /configuration $HOME/.config/nvim
+COPY --chown=$USER:$GROUP configuration/ $HOME/.config/nvim
 COPY --from=go /go/ /usr/local/
 COPY --from=neovim /neovim/ /usr/
 COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
