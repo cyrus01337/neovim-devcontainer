@@ -96,5 +96,3 @@ RUN ["apt-get", "autoremove", "-y"]
 
 FROM cleanup AS final
 USER $USER
-
-ENTRYPOINT ["nvim"]
