@@ -17,6 +17,14 @@ RUN apt-get update \
     && addgroup docker \
     && usermod -aG docker $USER;
 
+FROM system AS configuration
+USER root
+WORKDIR /configuration
+
+COPY ./configuration ./
+
+RUN git submodule update --init --remcursive;
+
 FROM system AS dive
 USER root
 
