@@ -21,7 +21,7 @@ FROM system AS configuration
 USER root
 WORKDIR /configuration
 
-RUN git clone --depth=1 --separate-git-dir=$(mktemp -u) https://github.com/cyrus01337/neovim-configuration.git .;
+COPY configuration ./
 
 FROM system AS dive
 USER root
