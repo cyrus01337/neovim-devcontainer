@@ -23,7 +23,7 @@ USER root
 COPY ./install-dive.sh .
 
 RUN ./install-dive.sh \
-    && rm ./install-dive.sh
+    && rm ./install-dive.sh;
 
 FROM system AS github-cli
 USER root
@@ -31,7 +31,7 @@ USER root
 COPY ./install-github-cli.sh .
 
 RUN ./install-github-cli.sh \
-    && rm ./install-github-cli.sh
+    && rm ./install-github-cli.sh;
 
 FROM system AS go
 USER $USER
@@ -39,7 +39,7 @@ WORKDIR /go
 
 RUN curl -fsLS https://go.dev/dl/go1.23.1.linux-amd64.tar.gz -o go.tar.gz \
     && tar xfz go.tar.gz \
-    && rm go.tar.gz
+    && rm go.tar.gz;
 
 FROM system AS neovim
 USER root
@@ -76,7 +76,7 @@ RUN curl -fsLS https://github.com/JohnnyMorganz/StyLua/releases/download/v0.20.0
 FROM system AS cleanup
 USER root
 
-COPY --chown=$USER:$GROUP configuration/ $HOME/.config/nvim
+COPY --chown=$USER:$GROUP ./configuration/ $HOME/.config/nvim
 COPY --from=go /go/ /usr/local/
 COPY --from=neovim /neovim/ /usr/
 COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
