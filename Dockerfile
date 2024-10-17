@@ -76,7 +76,7 @@ RUN curl -fsLS https://github.com/JohnnyMorganz/StyLua/releases/download/v0.20.0
 FROM system AS cleanup
 USER root
 
-COPY --chown=$USER:$GROUP /configuration/ $HOME/.config/nvim/
+COPY --chown=$USER:$GROUP ./configuration/ $HOME/.config/nvim/
 COPY --from=dive /usr/bin/dive /usr/bin/dive
 COPY --from=dive /var/lib/dpkg/info/dive.* /var/lib/dpkg/info/
 COPY --from=github-cli /etc/apt/keyrings/githubcli-archive-keyring.gpg /etc/apt/keyrings/
@@ -96,3 +96,5 @@ RUN ["apt-get", "autoremove", "-y"]
 
 FROM cleanup AS final
 USER $USER
+
+ENTRYPOINT ["nvim"]
