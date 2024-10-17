@@ -23,8 +23,6 @@ WORKDIR /configuration
 
 COPY ./configuration ./
 
-RUN git submodule update --init --recursive;
-
 FROM system AS dive
 USER root
 
