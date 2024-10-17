@@ -98,4 +98,3 @@ FROM cleanup AS final
 USER $USER
 
 ENTRYPOINT ["zsh"]
-CMD ["-c", "nvim"]

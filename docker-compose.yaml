@@ -1,0 +1,9 @@
+services:
+  devcontainer:
+    image: cyrus01337/neovim-devcontainer:latest
+    restart: unless-stopped
+    volumes:
+      - neovim-data:/home/developer/.local/share/nvim
+
+volumes:
+  neovim-data:
