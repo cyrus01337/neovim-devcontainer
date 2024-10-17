@@ -77,6 +77,13 @@ FROM system AS cleanup
 USER root
 
 COPY --chown=$USER:$GROUP ./configuration/ $HOME/.config/nvim
+COPY --from=dive /usr/bin/dive /usr/bin/dive
+COPY --from=dive /var/lib/dpkg/info/dive.* /var/lib/dpkg/info/
+COPY --from=github-cli /etc/apt/keyrings/githubcli-archive-keyring.gpg /etc/apt/keyrings/
+COPY --from=github-cli /etc/apt/sources.list.d/github-cli.list /etc/apt/sources.list.d/
+COPY --from=github-cli /usr/bin/gh /usr/bin/gh
+COPY --from=github-cli /usr/share/zsh/site-functions/_gh /usr/share/zsh/site-functions/_gh
+COPY --from=github-cli /var/lib/dpkg/info/gh.* /var/lib/dpkg/info/
 COPY --from=go /go/ /usr/local/
 COPY --from=neovim /neovim/ /usr/
 COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
