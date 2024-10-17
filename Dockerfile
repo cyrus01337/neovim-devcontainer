@@ -57,7 +57,6 @@ RUN curl -fsLS https://fnm.vercel.app/install | bash -s -- --skip-shell --instal
 ENV PATH="$HOME/.local/share/fnm:$PATH"
 
 RUN eval "$(fnm env --shell bash)" \
-    && fnm env --use-on-cd \
     && fnm use --install-if-missing 22 \
     && npm install -g live-server npm prettier;
 
