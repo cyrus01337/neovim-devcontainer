@@ -76,8 +76,6 @@ RUN curl -fsLS https://github.com/JohnnyMorganz/StyLua/releases/download/v0.20.0
 FROM system AS cleanup
 USER root
 
-RUN git submodule update --init --recursive;
-
 COPY --chown=$USER:$GROUP ./configuration/ $HOME/.config/nvim/
 COPY --from=dive /usr/bin/dive /usr/bin/dive
 COPY --from=dive /var/lib/dpkg/info/dive.* /var/lib/dpkg/info/
