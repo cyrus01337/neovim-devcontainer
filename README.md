@@ -32,5 +32,58 @@ which I've used [here](https://github.com/cyrus01337/bun-devcontainer).
 automatically
 - [`stylua`](https://github.com/JohnnyMorganz/StyLua) for auto-formatting
 
-## Author's Note
-I regret nothing.
+## Author's Notes
+~~I regret nothing.~~
+
+### Booting straight into Neovim
+
+```sh
+target="./"
+
+docker run \
+    --rm \
+    -itv $target:/workspace \
+    cyrus01337/neovim-devcontainer \
+    -c nvim .
+```
+
+### Git passthrough
+
+Without this, you won't be able to make any changes to a Git repository from
+within the container.
+
+```sh
+target="./"
+container_user="developer"
+
+docker run \
+    --rm \
+    -itv $target:/workspace \
+    -v $HOME/.gitconfig:/home/$container_user/.gitconfig \
+    -v $HOME/.git-credentials:/home/$container_user/.git-credentials \
+    cyrus01337/neovim-devcontainer \
+    ...
+```
+
+### Caching Neovim plugins/data
+Every time the container is spun up, plugins (and some dependencies) will be
+installed/compiled. You can cache them by creating an external Docker volume,
+then mounting it to the container.
+
+```sh
+target="./"
+container_user="developer"
+# The default location for Neovim's data directory is "$HOME/.local/share/nvim".
+# This points to the same directory but for the container's main user instead
+
+# If your Neovim setup uses a different directory, this would need to be
+# specified in the command shown
+neovim_data_directory="/home/$container_user/.local/share/nvim"
+
+docker run \
+    --rm \
+    -itv $target:/workspace \
+    -v neovim-data:$neovim_data_directory \
+    cyrus01337/neovim-devcontainer \
+    ...
+```

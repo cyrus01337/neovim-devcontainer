@@ -90,11 +90,12 @@ COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
 
 COPY --from=node --chown=$USER:$GROUP $HOME/.local/share/fnm/ $HOME/.local/share/fnm/
 
-RUN ["rm", "-rf", "/var/lib/apt/lists/*"]
-RUN ["apt-get", "clean"]
-RUN ["apt-get", "autoremove", "-y"]
+RUN rm -rf /var/lib/apt/lists/* \
+    && apt-get clean \
+    && apt-get autoremove -y;
 
 FROM cleanup AS final
 USER $USER
 
-ENTRYPOINT ["zsh"]
+RUN touch $HOME/.gitconfig $HOME/.git-credentials \
+    && mkdir -p $HOME/.local/share/nvim;
