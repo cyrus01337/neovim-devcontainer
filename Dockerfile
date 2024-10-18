@@ -3,6 +3,7 @@ ENV DEBIAN_FRONTEND="noninteractive"
 ENV USER="developer"
 ENV GROUP="$USER"
 ENV HOME="/home/$USER"
+ENV TERM="tmux-256color"
 USER root
 
 RUN apt-get update \
