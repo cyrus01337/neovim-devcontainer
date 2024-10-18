@@ -7,7 +7,7 @@ ENV TERM="tmux-256color"
 USER root
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends --no-install-suggests black fd-find gcc git isort jq lua5.1 luarocks make python3.11-venv python3-pip ripgrep unzip \
+    && apt-get install -y --no-install-recommends --no-install-suggests black fd-find gcc git isort jq lua5.1 luarocks make php-cli python3.11-venv python3-pip ripgrep unzip \
     iproute2 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
@@ -16,6 +16,13 @@ RUN apt-get update \
     \
     && addgroup docker \
     && usermod -aG docker $USER;
+
+FROM system AS composer
+USER root
+
+RUN curl -sS https://getcomposer.org/installer -o composer-setup.php \
+    && php composer-setup.php --install-dir=/usr/local/bin/ --filename=composer \
+    && rm composer-setup.php;
 
 FROM system AS delta
 USER root
@@ -86,6 +93,7 @@ FROM system AS cleanup
 USER root
 
 COPY --chown=$USER:$GROUP ./configuration/ $HOME/.config/nvim/
+COPY --from=composer /usr/local/bin/composer /usr/local/bin/composer
 COPY --from=delta /usr/bin/delta /usr/bin/delta
 COPY --from=delta /usr/share/doc/git-delta/ /usr/share/doc/git-delta/
 COPY --from=delta /var/lib/dpkg/info/git-delta.* /var/lib/dpk/info/
@@ -100,6 +108,7 @@ COPY --from=go /go/ /usr/local/
 COPY --from=neovim /neovim/ /usr/
 COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
 
+# This takes a while so we're leaving this at the end
 COPY --from=node --chown=$USER:$GROUP $HOME/.local/share/fnm/ $HOME/.local/share/fnm/
 
 RUN rm -rf /var/lib/apt/lists/* \
