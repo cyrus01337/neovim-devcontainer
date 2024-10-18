@@ -7,7 +7,7 @@ ENV TERM="tmux-256color"
 USER root
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends --no-install-suggests black fd-find gcc git isort lua5.1 luarocks make python3.11-venv python3-pip ripgrep unzip \
+    && apt-get install -y --no-install-recommends --no-install-suggests black fd-find gcc git isort jq lua5.1 luarocks make python3.11-venv python3-pip ripgrep unzip \
     iproute2 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
@@ -16,6 +16,15 @@ RUN apt-get update \
     \
     && addgroup docker \
     && usermod -aG docker $USER;
+
+FROM system AS delta
+USER root
+
+RUN curl https://api.github.com/repos/dandavison/delta/releases/latest \
+    | jq -r ".assets[9].browser_download_url" \
+    | xargs -r -I{} curl -L "{}" -o delta.deb \
+    && dpkg -i delta.deb \
+    && rm delta.deb;
 
 FROM system AS dive
 USER root
@@ -77,6 +86,9 @@ FROM system AS cleanup
 USER root
 
 COPY --chown=$USER:$GROUP ./configuration/ $HOME/.config/nvim/
+COPY --from=delta /usr/bin/delta /usr/bin/delta
+COPY --from=delta /usr/share/doc/git-delta/ /usr/share/doc/git-delta/
+COPY --from=delta /var/lib/dpkg/info/git-delta.* /var/lib/dpk/info/
 COPY --from=dive /usr/bin/dive /usr/bin/dive
 COPY --from=dive /var/lib/dpkg/info/dive.* /var/lib/dpkg/info/
 COPY --from=github-cli /etc/apt/keyrings/githubcli-archive-keyring.gpg /etc/apt/keyrings/
