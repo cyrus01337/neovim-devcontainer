@@ -1,8 +1,15 @@
+name: neovim-devcontainer
+
 services:
-  devcontainer:
+  neovim:
     image: cyrus01337/neovim-devcontainer:latest
-    restart: unless-stopped
+    restart: no
+    stdin_open: true
+    tty: true
     volumes:
+      - ${TARGET:-$PWD}:/workspace
+      - $HOME/.gitconfig:/home/developer/.gitconfig
+      - $HOME/.git-credentials:/home/developer/.git-credentials
       - neovim-data:/home/developer/.local/share/nvim
 
 volumes:
