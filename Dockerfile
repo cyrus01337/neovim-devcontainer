@@ -24,15 +24,6 @@ RUN curl -sS https://getcomposer.org/installer -o composer-setup.php \
     && php composer-setup.php --install-dir=/usr/local/bin/ --filename=composer \
     && rm composer-setup.php;
 
-FROM system AS delta
-USER root
-
-RUN curl https://api.github.com/repos/dandavison/delta/releases/latest \
-    | jq -r ".assets[9].browser_download_url" \
-    | xargs -r -I{} curl -L "{}" -o delta.deb \
-    && dpkg -i delta.deb \
-    && rm delta.deb;
-
 FROM system AS dive
 USER root
 
@@ -86,9 +77,6 @@ USER root
 
 COPY --chown=$USER:$GROUP ./configuration/ $HOME/.config/nvim/
 COPY --from=composer /usr/local/bin/composer /usr/local/bin/composer
-COPY --from=delta /usr/bin/delta /usr/bin/delta
-COPY --from=delta /usr/share/doc/git-delta/ /usr/share/doc/git-delta/
-COPY --from=delta /var/lib/dpkg/info/git-delta.* /var/lib/dpk/info/
 COPY --from=dive /usr/bin/dive /usr/bin/dive
 COPY --from=dive /var/lib/dpkg/info/dive.* /var/lib/dpkg/info/
 COPY --from=go /go/ /usr/local/
