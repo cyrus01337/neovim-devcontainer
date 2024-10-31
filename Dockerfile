@@ -78,7 +78,6 @@ USER root
 COPY --chown=$USER:$GROUP ./configuration/ $HOME/.config/nvim/
 COPY --from=composer /usr/local/bin/composer /usr/local/bin/composer
 COPY --from=dive /usr/bin/dive /usr/bin/dive
-COPY --from=dive /var/lib/dpkg/info/dive.* /var/lib/dpkg/info/
 COPY --from=go /go/ /usr/local/
 COPY --from=neovim /neovim/ /usr/
 COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
