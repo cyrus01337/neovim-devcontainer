@@ -14,7 +14,6 @@ RUN apt-get update \
     \
     && update-alternatives --install /usr/bin/python python /usr/bin/python3 20 \
     \
-    && addgroup docker \
     && usermod -aG docker $USER;
 
 FROM system AS composer
