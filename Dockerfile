@@ -1,4 +1,4 @@
-FROM cyrus01337/shell-devcontainer AS system
+FROM cyrus01337/shell-devcontainer:latest AS system
 ENV DEBIAN_FRONTEND="noninteractive"
 ENV USER="developer"
 ENV GROUP="$USER"
