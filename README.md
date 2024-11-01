@@ -21,9 +21,11 @@ This also acts as a base for other devcontainers like those that require [Bun](h
 which I've used [here](https://github.com/cyrus01337/bun-devcontainer).
 
 ## Inclusions
+
 - Whatever is included in the [Shell devcontainer](https://github.com/cyrus01337/shell-devcontainer)
 - Docker outside of Docker (with user added to `docker` group)
 - Obviously [Neovim](https://neovim.io/)
+- [`Docker`](https://docs.docker.com/) ((outside of Docker)[https://tdongsi.github.io/blog/2017/04/23/docker-out-of-docker/])
 - [`dive`](https://github.com/wagoodman/dive) for Docker image debugging
 - [`github-cli`](https://cli.github.com/) for GitHub repo manipulation
 - [`go`](https://go.dev/) as a plugin dependency
@@ -33,6 +35,7 @@ automatically
 - [`stylua`](https://github.com/JohnnyMorganz/StyLua) for auto-formatting
 
 ## Author's Notes
+
 ~~I regret nothing.~~
 
 ### Booting straight into Neovim
@@ -66,6 +69,7 @@ docker run \
 ```
 
 ### Caching Neovim plugins/data
+
 Every time the container is spun up, plugins (and some dependencies) will be
 installed/compiled. You can cache them by creating an external Docker volume,
 then mounting it to the container.
