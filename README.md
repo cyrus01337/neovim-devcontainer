@@ -47,7 +47,7 @@ docker run \
     --rm \
     -itv $target:/workspace \
     cyrus01337/neovim-devcontainer \
-    -c nvim .
+    fish -c nvim .
 ```
 
 ### Git passthrough
@@ -65,7 +65,7 @@ docker run \
     -v $HOME/.gitconfig:/home/$container_user/.gitconfig \
     -v $HOME/.git-credentials:/home/$container_user/.git-credentials \
     cyrus01337/neovim-devcontainer \
-    ...
+    fish
 ```
 
 ### Caching Neovim plugins/data
@@ -89,5 +89,5 @@ docker run \
     -itv $target:/workspace \
     -v neovim-data:$neovim_data_directory \
     cyrus01337/neovim-devcontainer \
-    ...
+    fish
 ```
