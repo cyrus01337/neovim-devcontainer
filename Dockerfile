@@ -4,15 +4,15 @@ ENV USER="developer"
 ENV GROUP="$USER"
 ENV HOME="/home/$USER"
 ENV TERM="tmux-256color"
+ENV TRANSIENT_PACKAGES="build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev"
 USER root
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends --no-install-suggests black fd-find gcc git isort jq lua5.1 luarocks make php-cli python3.11-venv python3-pip ripgrep unzip \
+    && apt-get install -y --no-install-recommends --no-install-suggests black fd-find gcc git isort jq lua5.1 luarocks make php-cli ripgrep unzip \
+    $TRANSIENT_PACKAGES \
     iproute2 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
-    \
-    && update-alternatives --install /usr/bin/python python /usr/bin/python3 20 \
     \
     && usermod -aG docker $USER;
 
@@ -59,9 +59,15 @@ RUN eval "$(fnm env --shell bash)" \
     && npm install -g live-server npm prettier;
 
 FROM system AS python
+ENV PATH="$HOME/.pyenv/bin:$PATH"
 USER $USER
+WORKDIR $HOME
 
-RUN python -m pip install -U pip;
+RUN curl https://pyenv.run | bash \
+    && eval "$(pyenv init -)" \
+    && eval "$(pyenv virtualenv-init -)";
+RUN pyenv install 3.11 \
+    && pyenv virtualenv 3.11 home;
 
 FROM system AS stylua
 USER root
@@ -83,8 +89,10 @@ COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
 
 # This takes a while so we're leaving this at the end
 COPY --from=node --chown=$USER:$GROUP $HOME/.local/share/fnm/ $HOME/.local/share/fnm/
+COPY --from=python --chown=$USER:$GROUP $HOME/.pyenv $HOME/.pyenv
 
-RUN rm -rf /var/lib/apt/lists/* \
+RUN apt-get remove -y $TRANSIENT_PACKAGES \
+    && rm -rf /var/lib/apt/lists/* \
     && apt-get clean \
     && apt-get autoremove -y;
 
