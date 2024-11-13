@@ -4,14 +4,16 @@ ENV USER="developer"
 ENV GROUP="$USER"
 ENV HOME="/home/$USER"
 ENV TERM="tmux-256color"
-ENV TRANSIENT_PACKAGES="build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev"
+ENV HELPFUL_PACKAGES="iproute2"
+ENV TRANSIENT_PACKAGES="build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev xz-utils"
 USER root
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends --no-install-suggests black fd-find gcc git isort jq lua5.1 luarocks make php-cli ripgrep unzip \
+RUN nala update \
+    && nala install -y --no-install-recommends --no-install-suggests black fd-find gcc git isort jq lua5.1 luarocks make php-cli ripgrep unzip \
+    $HELPFUL_PACKAGES \
     $TRANSIENT_PACKAGES \
-    iproute2 \
-    && apt-get clean \
+    && nala autoremove -y \
+    && nala clean \
     && rm -rf /var/lib/apt/lists/* \
     \
     && usermod -aG docker $USER;
@@ -77,6 +79,19 @@ RUN curl -fsLS https://github.com/JohnnyMorganz/StyLua/releases/download/v0.20.0
     && unzip stylua.zip \
     && rm stylua.zip;
 
+FROM system AS zig
+USER root
+ENV UNPACKED_DIRECTORY_NAME="zig-linux-x86_64-0.14.0-dev.2238+1db8cade5"
+WORKDIR /tmp
+
+RUN curl -L "https://ziglang.org/builds/${UNPACKED_DIRECTORY_NAME}.tar.xz" \
+    | tar -Jx "${UNPACKED_DIRECTORY_NAME}/lib/" "${UNPACKED_DIRECTORY_NAME}/zig";
+
+WORKDIR /zig
+
+RUN mv /tmp/${UNPACKED_DIRECTORY_NAME}/* . \
+    && rm -rf "/tmp/${UNPACKED_DIRECTORY_NAME}";
+
 FROM system AS cleanup
 USER root
 
@@ -86,15 +101,17 @@ COPY --from=dive /usr/bin/dive /usr/bin/dive
 COPY --from=go /go/ /usr/local/
 COPY --from=neovim /neovim/ /usr/
 COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
+COPY --from=zig /zig/lib/ /usr/lib/zig/
+COPY --from=zig /zig/zig /usr/bin/zig
 
 # This takes a while so we're leaving this at the end
 COPY --from=node --chown=$USER:$GROUP $HOME/.local/share/fnm/ $HOME/.local/share/fnm/
 COPY --from=python --chown=$USER:$GROUP $HOME/.pyenv $HOME/.pyenv
 
-RUN apt-get remove -y $TRANSIENT_PACKAGES \
+RUN nala remove -y $TRANSIENT_PACKAGES \
     && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean \
-    && apt-get autoremove -y;
+    && nala clean \
+    && nala autoremove -y;
 
 FROM cleanup AS final
 USER $USER
