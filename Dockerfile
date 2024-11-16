@@ -4,23 +4,25 @@ ENV USER="developer"
 ENV GROUP="$USER"
 ENV HOME="/home/$USER"
 ENV TERM="tmux-256color"
-ENV HELPFUL_PACKAGES="iproute2"
-ENV TRANSIENT_PACKAGES="build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev xz-utils"
+ENV HELPFUL_PACKAGES="iproute2 jq"
+ENV TRANSIENT_PACKAGES="curl"
 USER root
 
 RUN nala update \
-    && nala install -y --no-install-recommends --no-install-suggests black fd-find gcc git isort jq lua5.1 luarocks make php-cli ripgrep unzip \
+    && nala install -y --no-install-recommends --no-install-suggests fd-find gcc lua5.1 luarocks make ripgrep \
     $HELPFUL_PACKAGES \
     $TRANSIENT_PACKAGES \
     && nala autoremove -y \
-    && nala clean \
     && rm -rf /var/lib/apt/lists/* \
     \
     && usermod -aG docker $USER;
 
-FROM system AS composer
+FROM debian:bookworm-slim AS composer
 USER root
 
+RUN apt-get update \
+    && apt-get install -y curl php-cli \
+    && rm -rf /var/lib/apt/lists/*;
 RUN curl -sS https://getcomposer.org/installer -o composer-setup.php \
     && php composer-setup.php --install-dir=/usr/local/bin/ --filename=composer \
     && rm composer-setup.php;
@@ -60,30 +62,39 @@ RUN eval "$(fnm env --shell bash)" \
     && fnm use --install-if-missing 22 \
     && npm install -g live-server npm prettier;
 
-FROM system AS python
-ENV PATH="$HOME/.pyenv/bin:$PATH"
-USER $USER
-WORKDIR $HOME
+FROM debian:bookworm-slim AS python
+ENV PATH="/root/.pyenv/bin:/root/.local/pyenv/shims:$PATH"
+USER root
+WORKDIR /root/
 
-RUN curl https://pyenv.run | bash \
-    && eval "$(pyenv init -)" \
-    && eval "$(pyenv virtualenv-init -)";
-RUN pyenv install 3.11 \
-    && pyenv virtualenv 3.11 home;
+RUN apt-get update \
+    && apt-get install -y build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl git libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev \
+    && rm -rf /var/lib/apt/lists/*;
 
-FROM system AS stylua
+COPY install-pyenv.sh .
+
+RUN ./install-pyenv.sh \
+    && rm install-pyenv.sh;
+
+FROM debian:bookworm-slim AS stylua
 USER root
 WORKDIR /usr/bin
 
+RUN apt-get update \
+    && apt-get install -y curl unzip \
+    && rm -rf /var/lib/apt/lists/*;
 RUN curl -fsLS https://github.com/JohnnyMorganz/StyLua/releases/download/v0.20.0/stylua-linux-x86_64.zip -o stylua.zip \
     && unzip stylua.zip \
     && rm stylua.zip;
 
-FROM system AS zig
+FROM debian:bookworm-slim AS zig
 USER root
 ENV UNPACKED_DIRECTORY_NAME="zig-linux-x86_64-0.14.0-dev.2238+1db8cade5"
 WORKDIR /tmp
 
+RUN apt-get update \
+    && apt-get install -y curl xz-utils \
+    && rm -rf /var/lib/apt/lists/*;
 RUN curl -L "https://ziglang.org/builds/${UNPACKED_DIRECTORY_NAME}.tar.xz" \
     | tar -Jx "${UNPACKED_DIRECTORY_NAME}/lib/" "${UNPACKED_DIRECTORY_NAME}/zig";
 
@@ -106,12 +117,11 @@ COPY --from=zig /zig/zig /usr/bin/zig
 
 # This takes a while so we're leaving this at the end
 COPY --from=node --chown=$USER:$GROUP $HOME/.local/share/fnm/ $HOME/.local/share/fnm/
-COPY --from=python --chown=$USER:$GROUP $HOME/.pyenv $HOME/.pyenv
+COPY --from=python --chown=$USER:$GROUP /root/.pyenv $HOME/.pyenv
 
 RUN nala remove -y $TRANSIENT_PACKAGES \
-    && rm -rf /var/lib/apt/lists/* \
-    && nala clean \
-    && nala autoremove -y;
+    && nala autoremove -y \
+    && rm -rf /var/lib/apt/lists/*;
 
 FROM cleanup AS final
 USER $USER
