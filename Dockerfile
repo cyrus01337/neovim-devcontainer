@@ -9,7 +9,7 @@ ENV TRANSIENT_PACKAGES="curl"
 USER root
 
 RUN nala update \
-    && nala install -y --no-install-recommends --no-install-suggests fd-find gcc lua5.1 luarocks make ripgrep \
+    && nala install -y --no-install-recommends --no-install-suggests fd-find gcc lua5.1 luarocks make php-cli ripgrep \
     $HELPFUL_PACKAGES \
     $TRANSIENT_PACKAGES \
     && nala autoremove -y \
