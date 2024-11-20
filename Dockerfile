@@ -4,7 +4,7 @@ ENV USER="developer"
 ENV GROUP="$USER"
 ENV HOME="/home/$USER"
 ENV TERM="tmux-256color"
-ENV HELPFUL_PACKAGES="iproute2 jq"
+ENV HELPFUL_PACKAGES="iproute2 jq less openssh-client"
 ENV TRANSIENT_PACKAGES="curl"
 USER root
 
@@ -13,9 +13,7 @@ RUN nala update \
     $HELPFUL_PACKAGES \
     $TRANSIENT_PACKAGES \
     && nala autoremove -y \
-    && rm -rf /var/lib/apt/lists/* \
-    \
-    && usermod -aG docker $USER;
+    && rm -rf /var/lib/apt/lists/*;
 
 FROM debian:bookworm-slim AS composer
 USER root
