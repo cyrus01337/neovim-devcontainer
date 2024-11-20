@@ -4,7 +4,7 @@ ENV USER="developer"
 ENV GROUP="$USER"
 ENV HOME="/home/$USER"
 ENV TERM="tmux-256color"
-ENV HELPFUL_PACKAGES="iproute2 jq openssh-client"
+ENV HELPFUL_PACKAGES="iproute2 jq less openssh-client"
 ENV TRANSIENT_PACKAGES="curl"
 USER root
 
