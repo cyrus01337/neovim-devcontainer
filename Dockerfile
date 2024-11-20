@@ -41,6 +41,14 @@ RUN curl -fsLS https://go.dev/dl/go1.23.1.linux-amd64.tar.gz -o go.tar.gz \
     && tar xfz go.tar.gz \
     && rm go.tar.gz;
 
+FROM system AS lazygit
+USER root
+WORKDIR /lazygit
+
+RUN curl -fsSL https://github.com/jesseduffield/lazygit/releases/download/v0.44.1/lazygit_0.44.1_Linux_arm64.tar.gz -O lazygit.tar.gz \
+    && tar xf lazygit.tar.gz \
+    && rm lazygit.tar.gz;
+
 FROM system AS neovim
 USER root
 WORKDIR /neovim
@@ -63,7 +71,7 @@ RUN eval "$(fnm env --shell bash)" \
 FROM debian:bookworm-slim AS python
 ENV PATH="/root/.pyenv/bin:/root/.local/pyenv/shims:$PATH"
 USER root
-WORKDIR /root/
+WORKDIR /root
 
 RUN apt-get update \
     && apt-get install -y build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl git libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev \
@@ -105,13 +113,14 @@ FROM system AS cleanup
 USER root
 
 COPY --chown=$USER:$GROUP ./configuration/ $HOME/.config/nvim/
-COPY --from=composer /usr/local/bin/composer /usr/local/bin/composer
+COPY --from=composer /usr/local/bin/composer /usr/local/bin/
 COPY --from=dive /usr/bin/dive /usr/bin/dive
 COPY --from=go /go/ /usr/local/
+COPY --from=lazygit /lazygit/lazygit /usr/local/bin/
 COPY --from=neovim /neovim/ /usr/
-COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
+COPY --from=stylua /usr/bin/stylua /usr/bin/
 COPY --from=zig /zig/lib/ /usr/lib/zig/
-COPY --from=zig /zig/zig /usr/bin/zig
+COPY --from=zig /zig/zig /usr/bin/
 
 # This takes a while so we're leaving this at the end
 COPY --from=node --chown=$USER:$GROUP $HOME/.local/share/fnm/ $HOME/.local/share/fnm/
