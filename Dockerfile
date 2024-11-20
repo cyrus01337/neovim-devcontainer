@@ -45,7 +45,7 @@ FROM system AS lazygit
 USER root
 WORKDIR /lazygit
 
-RUN curl -fsSL https://github.com/jesseduffield/lazygit/releases/download/v0.44.1/lazygit_0.44.1_Linux_arm64.tar.gz -O lazygit.tar.gz \
+RUN curl -fsLS https://github.com/jesseduffield/lazygit/releases/download/v0.44.1/lazygit_0.44.1_Linux_arm64.tar.gz -o lazygit.tar.gz \
     && tar xf lazygit.tar.gz \
     && rm lazygit.tar.gz;
 
