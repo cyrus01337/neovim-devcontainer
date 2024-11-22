@@ -85,22 +85,6 @@ RUN curl -fsLS https://github.com/JohnnyMorganz/StyLua/releases/download/v0.20.0
     && unzip stylua.zip \
     && rm stylua.zip;
 
-FROM debian:bookworm-slim AS zig
-USER root
-ENV UNPACKED_DIRECTORY_NAME="zig-linux-x86_64-0.14.0-dev.2238+1db8cade5"
-WORKDIR /tmp
-
-RUN apt-get update \
-    && apt-get install -y curl xz-utils \
-    && rm -rf /var/lib/apt/lists/*;
-RUN curl -L "https://ziglang.org/builds/${UNPACKED_DIRECTORY_NAME}.tar.xz" \
-    | tar -Jx "${UNPACKED_DIRECTORY_NAME}/lib/" "${UNPACKED_DIRECTORY_NAME}/zig";
-
-WORKDIR /zig
-
-RUN mv /tmp/${UNPACKED_DIRECTORY_NAME}/* . \
-    && rm -rf "/tmp/${UNPACKED_DIRECTORY_NAME}";
-
 FROM system AS cleanup
 USER root
 
@@ -110,8 +94,6 @@ COPY --from=dive /usr/bin/dive /usr/bin/dive
 COPY --from=go /go/ /usr/local/
 COPY --from=neovim /neovim/ /usr/
 COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
-COPY --from=zig /zig/lib/ /usr/lib/zig/
-COPY --from=zig /zig/zig /usr/bin/zig
 
 # This takes a while so we're leaving this at the end
 COPY --from=node --chown=$USER:$GROUP $HOME/.local/share/fnm/ $HOME/.local/share/fnm/
