@@ -13,7 +13,9 @@ RUN nala update \
     $HELPFUL_PACKAGES \
     $TRANSIENT_PACKAGES \
     && nala autoremove -y \
-    && rm -rf /var/lib/apt/lists/*;
+    && rm -rf /var/lib/apt/lists/* \
+    \
+    && usermod -aG docker $USER;
 
 FROM debian:bookworm-slim AS composer
 USER root
