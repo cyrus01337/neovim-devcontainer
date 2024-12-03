@@ -4,6 +4,7 @@ ENV USER="developer"
 ENV GROUP="$USER"
 ENV HOME="/home/$USER"
 ENV TERM="tmux-256color"
+ENV FISH_CONFIGURATION_DIRECTORY="$HOME/.local/share/dotfiles/.config/fish"
 ENV HELPFUL_PACKAGES="iproute2 jq less openssh-client"
 ENV TRANSIENT_PACKAGES="curl"
 USER root
@@ -16,6 +17,12 @@ RUN nala update \
     && rm -rf /var/lib/apt/lists/* \
     \
     && usermod -aG docker $USER;
+
+FROM system AS bun
+USER $USER
+ENV BUN_INSTALL="$HOME/.bun"
+
+RUN curl -fsSL https://bun.sh/install | bash;
 
 FROM debian:bookworm-slim AS composer
 USER root
@@ -91,6 +98,8 @@ FROM system AS cleanup
 USER root
 
 COPY --chown=$USER:$GROUP ./configuration/ $HOME/.config/nvim/
+COPY --from=bun /home/developer/.bun /home/developer/.bun
+COPY --from=bun $FISH_CONFIGURATION_DIRECTORY/completions/bun.fish $FISH_CONFIGURATION_DIRECTORY/completions/bun.fish
 COPY --from=composer /usr/local/bin/composer /usr/local/bin/composer
 COPY --from=dive /usr/bin/dive /usr/bin/dive
 COPY --from=go /go/ /usr/local/
