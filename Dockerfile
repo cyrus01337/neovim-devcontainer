@@ -42,6 +42,13 @@ COPY ./install-dive.sh .
 RUN ./install-dive.sh \
     && rm ./install-dive.sh;
 
+FROM system AS lazygit
+USER root
+WORKDIR /lazygit
+
+RUN curl -fsLS https://github.com/jesseduffield/lazygit/releases/download/v0.44.1/lazygit_0.44.1_Linux_x86_64.tar.gz \
+    | tar xz;
+
 FROM system AS go
 USER $USER
 WORKDIR /go
@@ -103,6 +110,7 @@ COPY --from=bun $FISH_CONFIGURATION_DIRECTORY/completions/bun.fish $FISH_CONFIGU
 COPY --from=composer /usr/local/bin/composer /usr/local/bin/composer
 COPY --from=dive /usr/bin/dive /usr/bin/dive
 COPY --from=go /go/ /usr/local/
+COPY --from=lazygit /lazygit/lazygit /usr/local/bin/lazygit
 COPY --from=neovim /neovim/ /usr/
 COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
 
