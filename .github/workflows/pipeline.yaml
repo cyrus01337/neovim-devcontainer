@@ -9,6 +9,7 @@ on:
             - "Dockerfile"
             - "*.sh"
             - ".github/workflows/**"
+    workflow_dispatch:
     repository_dispatch:
 
 jobs:
