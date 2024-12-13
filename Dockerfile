@@ -4,7 +4,6 @@ ENV USER="developer"
 ENV GROUP="$USER"
 ENV HOME="/home/$USER"
 ENV TERM="tmux-256color"
-ENV FISH_CONFIGURATION_DIRECTORY="$HOME/.local/share/dotfiles/.config/fish"
 ENV HELPFUL_PACKAGES="iproute2 jq less"
 ENV TRANSIENT_PACKAGES="curl"
 USER root
@@ -106,7 +105,6 @@ USER root
 
 COPY --chown=$USER:$GROUP ./configuration/ $HOME/.config/nvim/
 COPY --from=bun /home/developer/.bun /home/developer/.bun
-COPY --from=bun $FISH_CONFIGURATION_DIRECTORY/completions/bun.fish $FISH_CONFIGURATION_DIRECTORY/completions/bun.fish
 COPY --from=composer /usr/local/bin/composer /usr/local/bin/composer
 COPY --from=dive /usr/bin/dive /usr/bin/dive
 COPY --from=go /go/ /usr/local/
@@ -114,9 +112,10 @@ COPY --from=lazygit /lazygit/lazygit /usr/local/bin/lazygit
 COPY --from=neovim /neovim/ /usr/
 COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
 
-# This takes a while so we're leaving this at the end
-COPY --from=node --chown=$USER:$GROUP $HOME/.local/share/fnm/ $HOME/.local/share/fnm/
+# Result of long-standing operations from shortest time taken - longest in
+# ascending order
 COPY --from=python --chown=$USER:$GROUP /root/.pyenv $HOME/.pyenv
+COPY --from=node --chown=$USER:$GROUP $HOME/.local/share/fnm/ $HOME/.local/share/fnm/
 
 RUN apt-get remove -y $TRANSIENT_PACKAGES \
     && apt-get autoremove -y \
