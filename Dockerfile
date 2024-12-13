@@ -9,11 +9,11 @@ ENV HELPFUL_PACKAGES="iproute2 jq less openssh-client"
 ENV TRANSIENT_PACKAGES="curl"
 USER root
 
-RUN nala update \
-    && nala install -y --no-install-recommends --no-install-suggests fd-find gcc lua5.1 luarocks make php-cli ripgrep \
-    $HELPFUL_PACKAGES \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends --no-install-suggests fd-find gcc lua5.1 luarocks make php-cli ripgrep \
     $TRANSIENT_PACKAGES \
-    && nala autoremove -y \
+    && apt-get install -y $HELPFUL_PACKAGES \
+    && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
     \
     && usermod -aG docker $USER;
@@ -118,8 +118,8 @@ COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
 COPY --from=node --chown=$USER:$GROUP $HOME/.local/share/fnm/ $HOME/.local/share/fnm/
 COPY --from=python --chown=$USER:$GROUP /root/.pyenv $HOME/.pyenv
 
-RUN nala remove -y $TRANSIENT_PACKAGES \
-    && nala autoremove -y \
+RUN apt-get remove -y $TRANSIENT_PACKAGES \
+    && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*;
 
 FROM cleanup AS final
