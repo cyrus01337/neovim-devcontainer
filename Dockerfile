@@ -5,7 +5,7 @@ ENV GROUP="$USER"
 ENV HOME="/home/$USER"
 ENV TERM="tmux-256color"
 ENV FISH_CONFIGURATION_DIRECTORY="$HOME/.local/share/dotfiles/.config/fish"
-ENV HELPFUL_PACKAGES="iproute2 jq less openssh-client"
+ENV HELPFUL_PACKAGES="iproute2 jq less"
 ENV TRANSIENT_PACKAGES="curl"
 USER root
 
