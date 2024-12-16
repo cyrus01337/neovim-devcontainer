@@ -4,12 +4,12 @@ ENV USER="developer"
 ENV GROUP="$USER"
 ENV HOME="/home/$USER"
 ENV TERM="tmux-256color"
-ENV HELPFUL_PACKAGES="iproute2 jq less"
+ENV HELPFUL_PACKAGES="iproute2 jq less parallel"
 ENV TRANSIENT_PACKAGES="curl"
 USER root
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends --no-install-suggests fd-find gcc lua5.1 luarocks make php-cli ripgrep \
+    && apt-get install -y --no-install-recommends --no-install-suggests fd-find gcc gnupg2 lua5.1 locales locales-all luarocks make php-cli ripgrep \
     $TRANSIENT_PACKAGES \
     && apt-get install -y $HELPFUL_PACKAGES \
     && apt-get autoremove -y \
@@ -101,6 +101,9 @@ RUN curl -fsLS https://github.com/JohnnyMorganz/StyLua/releases/download/v0.20.0
     && rm stylua.zip;
 
 FROM system AS cleanup
+ENV LC_ALL="en_GB.UTF-8"
+ENV LANG="en_GB.UTF-8"
+ENV LANGUAGE="en_GB.UTF-8"
 USER root
 
 COPY --chown=$USER:$GROUP ./configuration/ $HOME/.config/nvim/
@@ -114,8 +117,8 @@ COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
 
 # Result of long-standing operations from shortest time taken - longest in
 # ascending order
-COPY --from=python --chown=$USER:$GROUP /root/.pyenv $HOME/.pyenv
 COPY --from=node --chown=$USER:$GROUP $HOME/.local/share/fnm/ $HOME/.local/share/fnm/
+COPY --from=python --chown=$USER:$GROUP /root/.pyenv $HOME/.pyenv
 
 RUN apt-get remove -y $TRANSIENT_PACKAGES \
     && apt-get autoremove -y \
@@ -123,7 +126,4 @@ RUN apt-get remove -y $TRANSIENT_PACKAGES \
 
 FROM cleanup AS final
 USER $USER
-WORKDIR /workspace
-
-RUN touch $HOME/.gitconfig $HOME/.git-credentials \
-    && mkdir -p $HOME/.local/share/nvim;
+WORKDIR $HOME
