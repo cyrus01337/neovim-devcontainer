@@ -106,7 +106,6 @@ ENV LANG="en_GB.UTF-8"
 ENV LANGUAGE="en_GB.UTF-8"
 USER root
 
-COPY --chown=$USER:$GROUP ./configuration/ $HOME/.config/nvim/
 COPY --from=bun /home/developer/.bun /home/developer/.bun
 COPY --from=composer /usr/local/bin/composer /usr/local/bin/composer
 COPY --from=dive /usr/bin/dive /usr/bin/dive
