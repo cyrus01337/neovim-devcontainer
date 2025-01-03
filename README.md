@@ -42,10 +42,12 @@ automatically
 
 ```sh
 target="./"
+container_user="developer"
 
 docker run \
     --rm \
     -itv $target:/workspace \
+    -v $HOME/.config/nvim:/home/$container_user/.config/nvim \
     cyrus01337/neovim-devcontainer \
     fish -c nvim .
 ```
@@ -55,17 +57,18 @@ docker run \
 Without this, you won't be able to make any changes to a Git repository from
 within the container.
 
-```sh
+```diff
 target="./"
 container_user="developer"
 
 docker run \
     --rm \
     -itv $target:/workspace \
-    -v $HOME/.gitconfig:/home/$container_user/.gitconfig \
-    -v $HOME/.git-credentials:/home/$container_user/.git-credentials \
+    -v $HOME/.config/nvim:/home/$container_user/.config/nvim \
++   -v $HOME/.gitconfig:/home/$container_user/.gitconfig \
++   -v $HOME/.git-credentials:/home/$container_user/.git-credentials \
     cyrus01337/neovim-devcontainer \
-    fish
+    fish -c nvim .
 ```
 
 ### Caching Neovim plugins/data
@@ -74,7 +77,7 @@ Every time the container is spun up, plugins (and some dependencies) will be
 installed/compiled. You can cache them by creating an external Docker volume,
 then mounting it to the container.
 
-```sh
+```diff
 target="./"
 container_user="developer"
 # The default location for Neovim's data directory is "$HOME/.local/share/nvim".
@@ -82,12 +85,13 @@ container_user="developer"
 
 # If your Neovim setup uses a different directory, this would need to be
 # specified in the command shown
-neovim_data_directory="/home/$container_user/.local/share/nvim"
++ neovim_data_directory="/home/$container_user/.local/share/nvim"
 
 docker run \
     --rm \
     -itv $target:/workspace \
-    -v neovim-data:$neovim_data_directory \
+    -v $HOME/.config/nvim:/home/$container_user/.config/nvim \
++   -v neovim-data:$neovim_data_directory \
     cyrus01337/neovim-devcontainer \
-    fish
+    fish -c nvim .
 ```
