@@ -5,12 +5,10 @@ ENV GROUP="$USER"
 ENV HOME="/home/$USER"
 ENV TERM="tmux-256color"
 ENV HELPFUL_PACKAGES="iproute2 jq less parallel"
-ENV TRANSIENT_PACKAGES="curl"
 USER root
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends --no-install-suggests fd-find gcc gnupg2 lua5.1 locales locales-all luarocks make php-cli ripgrep \
-    $TRANSIENT_PACKAGES \
     && apt-get install -y $HELPFUL_PACKAGES \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
