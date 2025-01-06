@@ -39,6 +39,13 @@ COPY ./install-dive.sh .
 RUN ./install-dive.sh \
     && rm ./install-dive.sh;
 
+FROM system AS lazydocker
+USER root
+WORKDIR /lazydocker
+
+RUN curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash \
+    && mv ~/.local/bin/lazydocker .;
+
 FROM system AS lazygit
 USER root
 WORKDIR /lazygit
@@ -108,6 +115,7 @@ COPY --from=bun /home/developer/.bun /home/developer/.bun
 COPY --from=composer /usr/local/bin/composer /usr/local/bin/composer
 COPY --from=dive /usr/bin/dive /usr/bin/dive
 COPY --from=go /go/ /usr/local/
+COPY --from=lazydocker /lazydocker/lazydocker /usr/local/bin/lazydocker
 COPY --from=lazygit /lazygit/lazygit /usr/local/bin/lazygit
 COPY --from=neovim /neovim/ /usr/
 COPY --from=stylua /usr/bin/stylua /usr/bin/stylua
