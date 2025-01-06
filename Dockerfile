@@ -4,7 +4,7 @@ ENV USER="developer"
 ENV GROUP="$USER"
 ENV HOME="/home/$USER"
 ENV TERM="tmux-256color"
-ENV HELPFUL_PACKAGES="fzf iproute2 jq less parallel"
+ENV HELPFUL_PACKAGES="iproute2 jq less parallel"
 USER root
 
 RUN apt-get update \
